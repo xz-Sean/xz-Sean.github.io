@@ -9,7 +9,7 @@ redirect_from:
 
 ## Hi, I’m Xiangxin (Sean) Zhao 👋
 
-I am a **PhD Candidate in Computer Science at University College London (UCL)**,  
+I am a **PhD Candidate in Computer Science at University College London **,  
 supervised by **Dr. He Ye** and **Prof. Federica Sarro**.
 
 I am currently in the early stage of my PhD, exploring different research directions within computer science.
@@ -22,7 +22,7 @@ I am currently in the early stage of my PhD, exploring different research direct
 - **MSc in Environmental Data Science & Machine Learning**, Imperial College London  
 - **BSc in Mathematics**, University College London (UCL)
 
-My academic training has provided me with a strong foundation in mathematics and machine learning, which I am now building upon during my doctoral studies.
+My academic background has given me training in mathematics and machine learning, which I am continuing to develop during my doctoral studies.
 
 ---
 
