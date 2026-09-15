@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A concise, paper-facing report on the data sources, provenance, construction, and release structure of TrajRepair-Bench v2.">
+  <title>TrajRepair-Bench v2 — Data Sources &amp; Provenance</title>
+  <style>
+    :root {
+      --ink: #171717;
+      --muted: #66645f;
+      --line: #d9d6cf;
+      --paper: #f5f3ee;
+      --card: #fffefb;
+      --accent: #e15336;
+      --accent-soft: #f8dfd7;
+      --dark: #242321;
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.62;
+    }
+
+    a { color: inherit; text-underline-offset: 3px; }
+    a:hover { color: var(--accent); }
+
+    .shell {
+      width: min(calc(100% - 40px), var(--max));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(217, 214, 207, .9);
+      background: rgba(245, 243, 238, .94);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar .shell {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    nav { display: flex; gap: 20px; }
+    nav a { color: var(--muted); font-size: .86rem; text-decoration: none; }
+
+    header {
+      padding: 92px 0 64px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 920px;
+      margin-bottom: 20px;
+      font-size: clamp(2.7rem, 6vw, 5.6rem);
+      line-height: .96;
+      letter-spacing: -.055em;
+    }
+
+    .lede {
+      max-width: 800px;
+      margin-bottom: 36px;
+      color: #4d4b47;
+      font-size: clamp(1.05rem, 2vw, 1.32rem);
+    }
+
+    .status-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--card);
+    }
+
+    .metric {
+      min-height: 126px;
+      padding: 22px 18px;
+      border-right: 1px solid var(--line);
+    }
+
+    .metric:last-child { border-right: 0; }
+    .metric strong { display: block; font-size: 2.05rem; line-height: 1; letter-spacing: -.04em; }
+    .metric span { display: block; margin-top: 10px; color: var(--muted); font-size: .82rem; line-height: 1.35; }
+
+    main section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: .72fr 1.28fr;
+      gap: 60px;
+      margin-bottom: 34px;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: clamp(1.85rem, 3.4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -.035em;
+    }
+
+    h3 { margin-bottom: 8px; font-size: 1.12rem; letter-spacing: -.01em; }
+    .section-head p, .muted { color: var(--muted); }
+
+    .source-grid, .two-col, .four-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .source-grid { grid-template-columns: 1fr 1fr; }
+    .two-col { grid-template-columns: 1fr 1fr; }
+    .four-grid { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+    }
+
+    .card.accent { border-color: #e6b7a9; background: #fff9f6; }
+    .card.dark { color: white; border-color: var(--dark); background: var(--dark); }
+    .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+
+    .source-number {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .source-number strong { font-size: 3.35rem; line-height: 1; letter-spacing: -.05em; }
+    .source-number span { color: var(--muted); font-size: .78rem; text-align: right; text-transform: uppercase; letter-spacing: .08em; }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 7px 14px;
+      margin: 18px 0 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: .9rem;
+    }
+
+    .kv dt { color: var(--muted); }
+    .kv dd { margin: 0; font-weight: 650; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 54px 1fr 54px 1fr;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .flow-step {
+      min-height: 170px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+    }
+
+    .flow-step small { color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+    .flow-arrow { display: grid; place-items: center; color: var(--accent); font-size: 1.6rem; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      background: #f0eee8;
+      font-size: .73rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    td.num, th.num { text-align: right; white-space: nowrap; }
+    tfoot td { font-weight: 800; background: #faf8f3; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .tag { padding: 5px 9px; border-radius: 6px; background: #ece9e2; font-size: .78rem; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      counter-reset: gate;
+    }
+
+    .step {
+      position: relative;
+      min-height: 210px;
+      padding: 54px 18px 20px;
+      border-top: 3px solid var(--accent);
+      background: var(--card);
+      box-shadow: inset 0 0 0 1px var(--line);
+      counter-increment: gate;
+    }
+
+    .step::before {
+      content: "0" counter(gate);
+      position: absolute;
+      top: 15px;
+      left: 18px;
+      color: var(--accent);
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .step p { margin-bottom: 0; color: var(--muted); font-size: .86rem; }
+
+    .check-list { list-style: none; padding: 0; }
+    .check-list li { position: relative; margin: 8px 0; padding-left: 24px; }
+    .check-list li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 900; }
+
+    .paper-copy {
+      padding: 34px;
+      border-left: 5px solid var(--accent);
+      background: var(--card);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.04rem;
+      line-height: 1.72;
+    }
+
+    .note {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: #693224;
+      font-size: .88rem;
+    }
+
+    .refs { columns: 2; column-gap: 42px; padding-left: 22px; }
+    .refs li { break-inside: avoid; margin-bottom: 10px; }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #eae7df;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .87em;
+    }
+
+    footer { padding: 42px 0 64px; color: var(--muted); font-size: .85rem; }
+    footer .shell { display: flex; justify-content: space-between; gap: 30px; }
+
+    @media (max-width: 900px) {
+      nav { display: none; }
+      .metrics { grid-template-columns: repeat(3, 1fr); }
+      .metric:nth-child(3) { border-right: 0; }
+      .metric:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+      .section-head, .source-grid, .two-col { grid-template-columns: 1fr; gap: 22px; }
+      .four-grid { grid-template-columns: 1fr 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .flow { grid-template-columns: 1fr; gap: 10px; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(calc(100% - 24px), var(--max)); }
+      header { padding-top: 62px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric, .metric:nth-child(3) { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      .metric:nth-child(even) { border-right: 0; }
+      .metric:nth-last-child(-n+2) { border-bottom: 0; }
+      .four-grid, .steps { grid-template-columns: 1fr; }
+      .refs { columns: 1; }
+      footer .shell { flex-direction: column; }
+    }
+
+    @media print {
+      body { background: white; font-size: 11pt; }
+      .topbar { display: none; }
+      .shell { width: 100%; max-width: none; }
+      header, main section { padding: 28px 0; }
+      h1 { font-size: 38pt; }
+      .card, .flow-step, .table-wrap, .paper-copy, .step { break-inside: avoid; }
+      a { text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="shell">
+      <div class="brand">TrajRepair-Bench v2</div>
+      <nav aria-label="Report sections">
+        <a href="#sources">Sources</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#paper">Paper text</a>
+      </nav>
+    </div>
+  </div>
+
+  <header>
+    <div class="shell">
+      <p class="eyebrow">Paper-facing provenance brief</p>
+      <h1>Data Sources<br>&amp; Provenance</h1>
+      <p class="lede">A concise account of where TrajRepair-Bench v2 comes from, what was inherited from upstream benchmarks, what we constructed, and how every failed trajectory became an execution-validated repair instance.</p>
+      <div class="status-line">
+        <span class="pill"><span class="dot"></span> Verified against local manifests</span>
+        <span class="pill">15 September 2026</span>
+        <span class="pill">Current source-of-truth: <code>benchmark_v2/</code></span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="snapshot-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Dataset snapshot</p>
+            <h2 id="snapshot-title">One benchmark,<br>two acquisition lanes</h2>
+          </div>
+          <p>TrajRepair-Bench combines locally generated failures on Terminal-Bench tasks with public audit failures from Harbor-Index 1.0. Both lanes are normalized into the same repair protocol: revise a complete action list, replay it from a clean environment, and judge it by execution.</p>
+        </div>
+
+        <div class="metrics" aria-label="Benchmark headline statistics">
+          <div class="metric"><strong>285</strong><span>execution-verified failure instances</span></div>
+          <div class="metric"><strong>90</strong><span>unique tasks in the full shipped pool</span></div>
+          <div class="metric"><strong>200</strong><span>instances on the main evaluation board</span></div>
+          <div class="metric"><strong>10</strong><span>upstream benchmark families</span></div>
+          <div class="metric"><strong>16</strong><span>distinct failure-model labels</span></div>
+          <div class="metric"><strong>3</strong><span>agent scaffolds</span></div>
+        </div>
+
+        <div class="note"><strong>Counting convention.</strong> The current manifests support 10 upstream benchmark families, not 12. The full population is 285 = 200 test + 85 development instances. <code>INSTANCES.csv</code> contains 270 rows because 15 shipped development-only instances are recorded in the manifests and split file but not in that table.</div>
+      </div>
+    </section>
+
+    <section id="sources" aria-labelledby="sources-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Primary acquisition sources</p>
+            <h2 id="sources-title">Where the data came from</h2>
+          </div>
+          <p>The two boards differ in acquisition, not in evaluation semantics. The Terminal lane provides controlled model and scaffold diversity. The Harbor lane provides long, heterogeneous public failures over a wide collection of upstream task families.</p>
+        </div>
+
+        <div class="source-grid">
+          <article class="card">
+            <div class="source-number"><strong>159</strong><span>Terminal board<br>instances</span></div>
+            <h3>Terminal-Bench lane</h3>
+            <p>Task packages come from <a href="https://github.com/harbor-framework/terminal-bench-1">Terminal-Bench</a>. Failed trajectories were generated locally by running seven model labels through mini-swe-agent and OpenHands, then retaining failures that could be faithfully replayed.</p>
+            <dl class="kv">
+              <dt>Tasks retained</dt><dd>61</dd>
+              <dt>Failure models</dt><dd>7</dd>
+              <dt>Scaffolds</dt><dd>mini-swe-agent · OpenHands</dd>
+              <dt>Raw evidence</dt><dd>Reasoning · commands · observations</dd>
+              <dt>Provenance type</dt><dd>Locally generated organic failures</dd>
+            </dl>
+          </article>
+
+          <article class="card accent">
+            <div class="source-number"><strong>126</strong><span>Harbor board<br>instances</span></div>
+            <h3>Harbor-Index lane</h3>
+            <p>Task packages and public audit trajectories come from <a href="https://harbor-index.org/">Harbor-Index 1.0</a>, with task metadata available through the <a href="https://hub.harborframework.com/datasets/harbor-index/harbor-index-1.0/latest">Harbor Hub</a>. All selected runs use the Terminus-2 harness.</p>
+            <dl class="kv">
+              <dt>Tasks retained</dt><dd>29</dd>
+              <dt>Failure models</dt><dd>9</dd>
+              <dt>Scaffold</dt><dd>Terminus-2</dd>
+              <dt>Trajectory format</dt><dd>ATIF-derived R / P / O</dd>
+              <dt>Provenance type</dt><dd>Public audit failures</dd>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="transform-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Provenance boundary</p>
+            <h2 id="transform-title">Inherited versus constructed</h2>
+          </div>
+          <p>This distinction should be explicit in the paper. TrajRepair-Bench does not claim authorship of the upstream tasks. Its contribution is the transformation of real failed runs into reproducible, repairable, execution-validated instances.</p>
+        </div>
+
+        <div class="flow" aria-label="Data transformation flow">
+          <div class="flow-step">
+            <small>Inherited</small>
+            <h3>Upstream task package</h3>
+            <p>Task description, clean environment definition, official verifier semantics, and upstream reference assets used for dataset construction.</p>
+          </div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="flow-step">
+            <small>Observed</small>
+            <h3>Organic failed run</h3>
+            <p>Model reasoning, tool actions, terminal observations, the executable action sequence, and the upstream failure verdict.</p>
+          </div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="flow-step">
+            <small>Constructed by us</small>
+            <h3>Repair instance</h3>
+            <p>Normalized action list, reproduced failure, leak-audited failure scene, augmented checks, split metadata, clean-replay judge, and edit metrics.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="coverage" aria-labelledby="coverage-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Upstream coverage</p>
+            <h2 id="coverage-title">Ten benchmark families</h2>
+          </div>
+          <p>Counts below are regenerated from the two 285-instance manifests and the frozen 200-instance board. “Terminal-Bench” includes 159 direct Terminal-board instances plus 19 Terminal-Bench-family tasks represented through Harbor.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Upstream family</th>
+                <th>Primary domain</th>
+                <th class="num">Full pool instances</th>
+                <th class="num">Full pool tasks</th>
+                <th class="num">Main-board instances</th>
+                <th class="num">Main-board tasks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><a href="https://github.com/harbor-framework/terminal-bench-1">Terminal-Bench</a></td><td>Terminal and systems engineering</td><td class="num">178</td><td class="num">65</td><td class="num">132</td><td class="num">62</td></tr>
+              <tr><td><a href="https://gso-bench.github.io/">GSO</a></td><td>Repository-level performance optimization</td><td class="num">34</td><td class="num">7</td><td class="num">21</td><td class="num">7</td></tr>
+              <tr><td><a href="https://github.com/Future-House/BixBench">BixBench</a></td><td>Computational biology and bioinformatics</td><td class="num">20</td><td class="num">5</td><td class="num">8</td><td class="num">5</td></tr>
+              <tr><td><a href="https://algotune.io/">AlgoTune</a></td><td>Algorithm and numerical optimization</td><td class="num">16</td><td class="num">4</td><td class="num">14</td><td class="num">4</td></tr>
+              <tr><td><a href="https://spider2-sql.github.io/">Spider2</a></td><td>Enterprise data and DBT workflows</td><td class="num">10</td><td class="num">2</td><td class="num">8</td><td class="num">2</td></tr>
+              <tr><td><a href="https://github.com/sunblaze-ucb/cybergym">CyberGym</a></td><td>Real-world vulnerability analysis</td><td class="num">10</td><td class="num">2</td><td class="num">6</td><td class="num">2</td></tr>
+              <tr><td><a href="https://scicode-bench.github.io/">SciCode</a></td><td>Research-level scientific coding</td><td class="num">8</td><td class="num">2</td><td class="num">4</td><td class="num">2</td></tr>
+              <tr><td><a href="https://da-code-bench.github.io/">DA-Code</a></td><td>Executable data-science analysis</td><td class="num">4</td><td class="num">1</td><td class="num">3</td><td class="num">1</td></tr>
+              <tr><td><a href="https://github.com/princeton-nlp/USACO">USACO benchmark</a></td><td>Competitive programming</td><td class="num">3</td><td class="num">1</td><td class="num">2</td><td class="num">1</td></tr>
+              <tr><td><a href="https://github.com/LithiumDA/CodePDE">CodePDE</a></td><td>Numerical PDE solver generation</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">1</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td>Total</td><td>—</td><td class="num">285</td><td class="num">90</td><td class="num">200</td><td class="num">87</td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="producers-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Failure producers</p>
+            <h2 id="producers-title">Models and scaffolds</h2>
+          </div>
+          <p>The models listed here produced the source failures; they are not the repair models evaluated later. The dataset intentionally contains multiple model and scaffold identities so that repair systems face heterogeneous failure styles.</p>
+        </div>
+
+        <div class="two-col">
+          <article class="card">
+            <h3>Terminal-Bench failures</h3>
+            <p class="muted">159 trajectories · 7 model labels · 2 scaffolds</p>
+            <div class="tag-list" aria-label="Terminal failure models">
+              <span class="tag">Qwen · 26</span><span class="tag">Kimi · 26</span><span class="tag">Devstral · 25</span><span class="tag">DeepSeek v3.2 · 24</span><span class="tag">Gemini · 23</span><span class="tag">Claude · 20</span><span class="tag">GPT-5 · 15</span>
+            </div>
+            <dl class="kv">
+              <dt>mini-swe-agent</dt><dd>106 instances</dd>
+              <dt>OpenHands</dt><dd>53 instances</dd>
+            </dl>
+          </article>
+
+          <article class="card">
+            <h3>Harbor failures</h3>
+            <p class="muted">126 trajectories · 9 model labels · Terminus-2</p>
+            <div class="tag-list" aria-label="Harbor failure models">
+              <span class="tag">MiniMax M3 · 16</span><span class="tag">Gemini 3.1 Pro · 16</span><span class="tag">GLM 5.2 · 15</span><span class="tag">DeepSeek v4 Pro · 15</span><span class="tag">Qwen 3.7 Max · 13</span><span class="tag">MiMo v2.5 Pro · 13</span><span class="tag">Kimi K2.6 · 13</span><span class="tag">Claude Opus 4.8 · 13</span><span class="tag">GPT-5.5 · 12</span>
+            </div>
+            <dl class="kv">
+              <dt>Scaffold</dt><dd><a href="https://www.harborframework.com/docs/agents/terminus-2">Terminus-2</a> · 126 instances</dd>
+              <dt>Format</dt><dd>ATIF public audit trajectories</dd>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pipeline" aria-labelledby="pipeline-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Construction protocol</p>
+            <h2 id="pipeline-title">From failed run to repair benchmark</h2>
+          </div>
+          <p>Admission depends on executable evidence. Every instance must preserve the original task semantics, reproduce the source failure, expose a faithful but leak-free failure scene, and support clean replay of a submitted action list.</p>
+        </div>
+
+        <div class="steps">
+          <article class="step"><h3>Extract</h3><p>Project reasoning, terminal actions, and observations into a normalized R/P/O trajectory and executable action list.</p></article>
+          <article class="step"><h3>Reproduce</h3><p>Replay the original action list from the official clean environment. Keep the instance only when the failure is reproduced.</p></article>
+          <article class="step"><h3>Snapshot</h3><p>Capture the post-failure container for diagnosis, then remove tests, oracle material, and authoring artifacts.</p></article>
+          <article class="step"><h3>Augment</h3><p>Add executable goal, enabler, and constraint checks derived from the specification and upstream assets.</p></article>
+          <article class="step"><h3>Select</h3><p>Deduplicate by failure signature or repair similarity, apply quality gates, and freeze the development/test split.</p></article>
+        </div>
+
+        <div class="two-col" style="margin-top:18px">
+          <article class="card dark">
+            <h3>Agent-visible evidence</h3>
+            <ul class="check-list">
+              <li>Original task description</li>
+              <li>Full failed R/P/O trajectory</li>
+              <li>Numbered original action list</li>
+              <li>Explorable failure-scene container</li>
+              <li>Submission schema and scoring rules</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Withheld evaluation assets</h3>
+            <ul class="check-list">
+              <li>Official tests and verifier internals</li>
+              <li>Reference solution or repair oracle</li>
+              <li>Localization truth and construction evidence</li>
+              <li>Private augmented-check implementation</li>
+              <li>Judge results before final submission</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="verification-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Quality and evaluation</p>
+            <h2 id="verification-title">Execution is the oracle</h2>
+          </div>
+          <p>A repair system submits a complete revised action list. The evaluator computes the diff automatically, replays the list from a clean environment, and reports both upstream and strengthened correctness verdicts.</p>
+        </div>
+
+        <div class="four-grid">
+          <article class="card"><h3>Failure fidelity</h3><p>All 285 source action lists have corresponding replayed failure scenes. Harbor records preserve a zero reward on all 126 selected failures.</p></article>
+          <article class="card"><h3>Official verdict</h3><p><strong>Repair@1 (official)</strong> uses the task's inherited official verifier and remains the externally comparable result.</p></article>
+          <article class="card"><h3>Strict verdict</h3><p><strong>Repair@1 (strict)</strong> requires both the official verifier and augmented specification checks to pass.</p></article>
+          <article class="card"><h3>Repair cost</h3><p>Replaced, deleted, and inserted actions are derived from the old/new list alignment. Correctness remains primary.</p></article>
+        </div>
+
+        <div class="note"><strong>Augmented-check accounting.</strong> Harbor contributes 1,421 checkpoint-instance evaluations from 337 unique probes across 29 task catalogs. The Terminal lane contains 496 task-level checkpoints across 61 tasks, including 228 directly executable end-state probes. These are different counting units and should not be added as if they were the same statistic.</div>
+      </div>
+    </section>
+
+    <section aria-labelledby="split-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Release structure</p>
+            <h2 id="split-title">Population and frozen split</h2>
+          </div>
+          <p>The benchmark ships 285 verified instances. The main board is the frozen test set. Development instances are separated according to whether their underlying task also appears on the test board.</p>
+        </div>
+
+        <div class="four-grid">
+          <article class="card accent"><div class="source-number"><strong>200</strong><span>test</span></div><h3>Main board</h3><p>118 Terminal-board and 82 Harbor-board failures across 87 tasks. Frozen-config final evaluation only.</p></article>
+          <article class="card"><div class="source-number"><strong>3</strong><span>strict dev</span></div><h3>Task-disjoint</h3><p>Underlying tasks do not occur on the main board. Intended for genuine method development.</p></article>
+          <article class="card"><div class="source-number"><strong>82</strong><span>loose dev</span></div><h3>Shared-task analysis</h3><p>Shares an underlying task with the main board. Suitable for analysis, not parameter selection.</p></article>
+          <article class="card"><div class="source-number"><strong>285</strong><span>total</span></div><h3>Shipped pool</h3><p>Every manifest instance appears in exactly one frozen split; all have workspace and image metadata.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="paper" aria-labelledby="paper-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Paper-ready wording</p>
+            <h2 id="paper-title">Data sources paragraph</h2>
+          </div>
+          <p>This paragraph is deliberately conservative: it distinguishes upstream material from our transformations and uses the current 10-family counting convention.</p>
+        </div>
+
+        <div class="paper-copy">
+          TrajRepair-Bench v2 aggregates organic failed agent executions from two acquisition lanes. The Terminal-Bench lane contains 159 failures over 61 tasks, generated locally by seven model configurations using mini-swe-agent and OpenHands. The Harbor lane contains 126 failures over 29 tasks, selected from the public audit trajectories of Harbor-Index 1.0 and generated by nine model configurations under Terminus-2. Across both lanes, the resulting pool contains 285 execution-verified failures over 90 tasks from ten upstream benchmark families. We normalize each run into a reasoning/action/observation trajectory and an executable action list, replay the original list from the official clean environment to reproduce the failure, and snapshot a leak-audited post-failure container for diagnosis. A repair system submits a complete revised action list, which is replayed from a clean environment and evaluated using the inherited official verifier together with augmented specification checks. The frozen main board contains 200 instances over 87 tasks; the remaining 85 instances form the development pool.
+        </div>
+
+        <div class="note"><strong>Before submission.</strong> Add the exact upstream dataset versions or commit hashes used during acquisition. The current release manifests record source names and instance-level provenance but do not yet provide one consolidated, paper-ready version table for all ten upstream families.</div>
+      </div>
+    </section>
+
+    <section aria-labelledby="citation-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Citation checklist</p>
+            <h2 id="citation-title">What the paper should cite</h2>
+          </div>
+          <p>Cite both the immediate acquisition source and the underlying benchmark families. If space is limited, keep the full family-level provenance in an appendix or dataset card.</p>
+        </div>
+
+        <ol class="refs">
+          <li><a href="https://github.com/harbor-framework/terminal-bench-1">Terminal-Bench</a> — task packages and official terminal verifiers.</li>
+          <li><a href="https://harbor-index.org/">Harbor-Index 1.0</a> and the <a href="https://hub.harborframework.com/datasets/harbor-index/harbor-index-1.0/latest">Harbor Hub</a> — immediate source of Harbor tasks and public audit runs.</li>
+          <li><a href="https://www.harborframework.com/docs/agents/terminus-2">Terminus-2</a> — the Harbor failure-generation scaffold and ATIF trajectory producer.</li>
+          <li><a href="https://github.com/SWE-agent/mini-swe-agent">mini-swe-agent</a> and <a href="https://github.com/OpenHands/OpenHands">OpenHands</a> — Terminal-lane failure-generation scaffolds.</li>
+          <li><a href="https://gso-bench.github.io/">GSO</a>, <a href="https://algotune.io/">AlgoTune</a>, <a href="https://github.com/Future-House/BixBench">BixBench</a>, and <a href="https://spider2-sql.github.io/">Spider2</a>.</li>
+          <li><a href="https://github.com/sunblaze-ucb/cybergym">CyberGym</a>, <a href="https://scicode-bench.github.io/">SciCode</a>, <a href="https://da-code-bench.github.io/">DA-Code</a>, <a href="https://github.com/princeton-nlp/USACO">USACO benchmark</a>, and <a href="https://github.com/LithiumDA/CodePDE">CodePDE</a>.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section aria-labelledby="governance-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Release and governance</p>
+            <h2 id="governance-title">Traceability safeguards</h2>
+          </div>
+          <p>These controls make the dataset auditable and reduce contamination or accidental answer leakage.</p>
+        </div>
+
+        <div class="two-col">
+          <article class="card">
+            <h3>Traceability</h3>
+            <ul class="check-list">
+              <li>Per-instance source task, model, scaffold, action count, and image mapping</li>
+              <li>Separate manifests for Terminal and Harbor acquisition lanes</li>
+              <li>Frozen development/test split with documented pre-freeze exposure</li>
+              <li>Failure-scene leak audits and source-failure replay evidence</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Distribution</h3>
+            <ul class="check-list">
+              <li>TrajRepair dataset layer declared CC BY 4.0</li>
+              <li>Repository code licensed separately</li>
+              <li>Upstream ownership, licenses, and citation obligations remain applicable</li>
+              <li>Evaluation-only canary embedded in examinee-facing artifacts</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <div><strong>TrajRepair-Bench v2</strong><br>Data Sources &amp; Provenance</div>
+      <div>Local authorities: <code>MANIFEST.json</code> · <code>board_harbor/MANIFEST.json</code> · <code>MAIN_BOARD_200.json</code> · <code>SPLIT.json</code></div>
+    </div>
+  </footer>
+</body>
+</html>
