@@ -13,7 +13,7 @@ site_theme               : "default"   # 你也可以之后改成 "air"/"mint"/"
 title                    : "Xiangxin (Sean) Zhao"
 title_separator          : "-"
 name                     : &name "Xiangxin (Sean) Zhao"
-description              : &description "PhD Candidate in Computer Science at UCL. Supervised by Dr. He Ye and Prof. Federica Sarro."
+description              : &description "PhD Candidate in Computer Science at UCL, working on the reliability of LLM coding agents. Supervised by Dr. He Ye and Prof. Federica Sarro."
 url                      : "https://xz-Sean.github.io"
 baseurl                  : ""
 repository               : "xz-Sean/xz-Sean.github.io"
@@ -27,7 +27,7 @@ author:
   avatar           : "profile.jpg"
   name             : "Xiangxin Zhao"
   pronouns         : # example: "she/her"  
-  bio              : "PhD Candidate (CS) @ UCL. Supervised by Dr. He Ye & Prof. Federica Sarro."
+  bio              : "PhD Candidate (CS) @ UCL, working on LLM coding agents. Supervised by Dr. He Ye & Prof. Federica Sarro."
   location         : "London, UK"
   employer         : "University College London"
   uri              : # URL
@@ -85,12 +85,10 @@ author:
 
 # Publication Category - The following the list of publication categories and their headings
 publication_category:
-  books:
-    title: 'Books'
-  manuscripts:
-    title: 'Journal Articles'    
   conferences:
-    title: 'Conference Papers'
+    title: 'Peer-Reviewed Papers'
+  preprints:
+    title: 'Preprints & Under Review'
 
 # Site Settings
 teaser                   :  # filename of teaser fallback teaser image placed in /images/ for social media previews
